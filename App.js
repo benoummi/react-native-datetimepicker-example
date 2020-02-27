@@ -1,30 +1,50 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
-import React from 'react';
 import {
   SafeAreaView,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
   View,
   Text,
   StatusBar,
+  Button,
+  Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import {Header, Colors} from 'react-native/Libraries/NewAppScreen';
+import React, {useState} from 'react';
+import moment from 'moment';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const App = () => {
+  const [date, setDate] = useState(new Date(1598051730000));
+  const [mode, setMode] = useState('date');
+  const [show, setShow] = useState(false);
+  const [display, setDisplay] = useState('default');
 
-const App: () => React$Node = () => {
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+
+    setShow(Platform.OS === 'ios');
+    setDate(currentDate);
+  };
+
+  const showMode = currentMode => {
+    setShow(true);
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode('date');
+    setDisplay('default');
+  };
+
+  const showDatepickerSpinner = () => {
+    showMode('date');
+    setDisplay('spinner');
+  };
+
+  const showTimepicker = () => {
+    showMode('time');
+  };
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -39,32 +59,49 @@ const App: () => React$Node = () => {
             </View>
           )}
           <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
+            <View testID="appRootView" style={styles.container}>
+              <View style={styles.header}>
+                <Text style={styles.text}>Example DateTime Picker</Text>
+              </View>
+              <View style={styles.button}>
+                <Button
+                  testID="datePickerButton"
+                  onPress={showDatepicker}
+                  title="Show date picker default!"
+                />
+              </View>
+              <View style={styles.button}>
+                <Button
+                  testID="datePickerButton"
+                  onPress={showDatepickerSpinner}
+                  title="Show date picker spinner!"
+                />
+              </View>
+              <View style={styles.button}>
+                <Button
+                  testID="timePickerButton"
+                  onPress={showTimepicker}
+                  title="Show time picker!"
+                />
+              </View>
+              <View style={styles.header}>
+                <Text testID="dateTimeText" style={styles.dateTimeText}>
+                  {mode === 'time' && moment.utc(date).format('HH:mm')}
+                  {mode === 'date' && moment.utc(date).format('MM/DD/YYYY')}
+                </Text>
+              </View>
+              {show && (
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  timeZoneOffsetInMinutes={0}
+                  value={date}
+                  mode={mode}
+                  is24Hour
+                  display={display}
+                  onChange={onChange}
+                />
+              )}
             </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -83,24 +120,6 @@ const styles = StyleSheet.create({
   body: {
     backgroundColor: Colors.white,
   },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
   footer: {
     color: Colors.dark,
     fontSize: 12,
@@ -108,6 +127,28 @@ const styles = StyleSheet.create({
     padding: 4,
     paddingRight: 12,
     textAlign: 'right',
+  },
+  container: {
+    marginTop: 32,
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  button: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  dateTimeText: {
+    fontSize: 16,
+    fontWeight: 'normal',
   },
 });
 
